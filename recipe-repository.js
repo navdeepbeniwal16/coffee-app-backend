@@ -1,69 +1,14 @@
-let recipes = [
-  {
-    recipeId: 1,
-    title: "Mocha",
-    description: "Sweet. Chocolatey. Mildly Caffinated",
-    sourceBarista: "CafeCoffeeDay",
-    sourceBaristaId: 101,
-    currentRating: 2.67,
-    imageUrl: "https://pixabay.com/images/search/nature/",
-    timeToMake: 15.0,
-    brewType: "Mild brew",
-    publishedDate: "2021-12-20T13:16:31.436+00:00",
-    calories: 5.87,
-    ingredients: ["Coffee", "Sugar", "Water"],
-    labels: ["Bitter", "Non-Milk", "Caffinated"],
-    ratingsList: [2.5, 2.0, 1.5, 2.5, 1.1, 2.7],
-    intakeAmount: 51.1,
-    caffineAmountLabel: "MEDIUM",
-    instructions: ["First Step", "Second Step", "Third Step", "Fourth Step"],
-    bookMarked: false,
-  },
-  {
-    recipeId: 2,
-    title: "Cuppachino",
-    description: "Sweet. Chocolatey. Low Caffinated, Milky",
-    sourceBarista: "Starbucks",
-    sourceBaristaId: 102,
-    currentRating: 2.67,
-    imageUrl: "https://pixabay.com/images/search/nature/",
-    timeToMake: 15.0,
-    brewType: "Mild brew",
-    publishedDate: "2021-12-26T13:16:31.436+00:00",
-    calories: 5.87,
-    ingredients: ["Coffee", "Sugar", "Milk"],
-    labels: ["Bitter", "Milk", "Caffinated"],
-    ratingsList: [2.5, 3.0, 2.5, 3.5, 3.1, 2.7],
-    intakeAmount: 51.1,
-    caffineAmountLabel: "MEDIUM",
-    instructions: ["First Step", "Second Step", "Third Step", "Fourth Step"],
-    bookMarked: false,
-  },
-  {
-    recipeId: 3,
-    title: "Americano",
-    description: "Sweet. Chocolatey. Highly Caffinated",
-    sourceBarista: "COSTA",
-    sourceBaristaId: 103,
-    currentRating: 2.67,
-    imageUrl: "https://pixabay.com/images/search/nature/",
-    timeToMake: 15.0,
-    brewType: "Strong brew",
-    publishedDate: "2021-12-30T13:16:31.436+00:00",
-    calories: 5.87,
-    ingredients: ["Coffee", "Sugar", "Water"],
-    labels: ["Bitter", "Non-Milk", "Caffinated"],
-    ratingsList: [4.5, 4.0, 3.5, 3.5, 4.1, 4.7],
-    intakeAmount: 51.1,
-    caffineAmountLabel: "MEDIUM",
-    instructions: ["First Step", "Second Step", "Third Step", "Fourth Step"],
-    bookMarked: false,
-  }
-];
+const fs = require('fs');
 
-let recipesSize = 3;
+const fileContent = fs.readFileSync('data.json', 'utf-8');
+const parsedJsonData = JSON.parse(fileContent);
 
-const getRecipiesSize = () => recipes.length;
+let recipes = parsedJsonData.recipes;
+let recipesSize = recipes.length;
+
+function getRecipiesSize() {
+    return recipes.length;
+}
 
 const findAllRecipes = () => {
     return recipes;
@@ -85,24 +30,29 @@ const saveRecipe = recipe => {
     return recipe;
 }
 
-const updateRecipeById = (recipeId, updatedRecipe) => {
-    for(let recipeIndex in recipes){
-        const recipe = recipes[recipeIndex];
-        if(recipe.recipeId === recipeId){
-            recipes[recipeIndex] = updatedRecipe;
-            return recipes[recipeIndex];
-        }
+const updateRecipe = (recipeId, recipeBody) => {
+    if(recipeId === undefined || recipeId === null)
+        return null;
+
+    if(recipeBody === undefined || recipeBody === null)
+        return null;
+
+    const recipeIndex = recipes.findIndex(r => r.recipeId === recipeId);
+    if(recipeIndex === -1){
+        return null;
     }
-    return null;
-}
+
+    recipeBody.id = recipeId;
+    recipes[recipeIndex] = recipeBody;
+    return recipeBody;
+} 
 
 const deleteRecipeById = recipeId => {
-    for(let recipeIndex in recipes){
-        if(recipes[recipeIndex].recipeId === recipeId){
-            return recipes.splice(recipeIndex, 1);
-        }
-    }
-    return null;
+    const recipeIndex = recipes.findIndex(r => r.recipeId === recipeId);
+    if(recipeIndex === -1)
+        return null;
+
+    return recipes.splice(recipeIndex, 1);
 }
 
 const findLatestRecipes = size => {
@@ -137,10 +87,10 @@ module.exports = {
         findAllRecipes : findAllRecipes,
         findRecipeById : findRecipeById,
         saveRecipe : saveRecipe,
-        updateRecipeById : updateRecipeById,
         deleteRecipeById : deleteRecipeById,
         findLatestRecipes : findLatestRecipes,
-        findTrendingRecipes : findTrendingRecipes
+        findTrendingRecipes : findTrendingRecipes,
+        updateRecipe : updateRecipe
     }
 }
 

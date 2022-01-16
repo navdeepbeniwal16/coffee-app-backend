@@ -12,7 +12,7 @@ app.get('/recipes', (req, res, next) => {
     const recipes = repositoryActions.findAllRecipes();
     const response = prepareSuccessResonse('recipes',recipes);
     res.status(200).json(response);
-})
+});
 
 // handler to get recipies in the order - lastest to oldest
 app.get('/recipes/latest', (req, res, next) => {
@@ -20,14 +20,14 @@ app.get('/recipes/latest', (req, res, next) => {
     const recipes = repositoryActions.findLatestRecipes(queryDataSize);
     const response = prepareSuccessResonse('recipes',recipes);
     res.status(200).json(response);
-})
+});
 
 app.get('/recipes/trending', (req, res, next) => {
     const queryDataSize = req.query.size ? req.query.size : -1; // -1 is default value to fetch all the recipes
     const recipes = repositoryActions.findTrendingRecipes(queryDataSize);
     const response = prepareSuccessResonse('recipes',recipes);
     res.status(200).json(response);
-})
+});
 
 app.get('/recipes/:id', (req, res, next) => {
     const recipeId = Number(req.params.id);
@@ -38,7 +38,30 @@ app.get('/recipes/:id', (req, res, next) => {
     } else {
         res.status(404).send(`Recipe with Id : ${recipeId} not found.`);
     }
-})
+});
+
+app.put('/recipes/:id', (req, res, next) => {
+    const recipeId = Number(req.params.id);
+    const recipeBody = req.body;
+    const updatedRecipe = repositoryActions.updateRecipe(recipeId, recipeBody);
+
+    if(updatedRecipe === null){
+        res.status(404).send('Recipe with the given Id not found.');
+    } else {
+        res.status(200).send(updatedRecipe);
+    }
+});
+
+app.delete('/recipes/:id', (req, res, next) => {
+    const recipeId = Number(req.params.id);
+    const deletedRecipe = repositoryActions.deleteRecipeById(recipeId);
+
+    if(deletedRecipe === null){
+        res.status(404).send('Recipe with the given Id not found.');
+    } else {
+        res.status(200).send(deletedRecipe);
+    }
+});
 
 const prepareSuccessResonse = (title, data) => {
     let size = 0;
