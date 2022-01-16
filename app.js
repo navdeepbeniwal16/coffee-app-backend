@@ -1,8 +1,10 @@
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
 
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+// app.use(express.json());
+// app.use(express.urlencoded({extended: true}));
+app.use(bodyParser.json());
 
 const { repositoryActions } = require('./recipe-repository');
 
@@ -39,6 +41,17 @@ app.get('/recipes/:id', (req, res, next) => {
         res.status(404).send(`Recipe with Id : ${recipeId} not found.`);
     }
 });
+
+app.post('/recipes', (req, res, next) => {
+    const recipeData = req.body;
+    
+    if(recipeData === undefined || recipeData === null)
+        res.status(400).send('Recipe data sent is invalid');
+
+    const savedRecipe =repositoryActions.saveRecipe(recipeData);
+
+    return res.status(201).send(savedRecipe);
+})
 
 app.put('/recipes/:id', (req, res, next) => {
     const recipeId = Number(req.params.id);
